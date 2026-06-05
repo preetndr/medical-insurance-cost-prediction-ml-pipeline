@@ -1,0 +1,10 @@
+ipykernel
+pandas
+numpy
+scikit-learn
+seaborn
+matplotlib
+kagglesdk==0.1.23
+kagglehub
+streamlit
+openpyxl
