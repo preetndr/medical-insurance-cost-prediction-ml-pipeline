@@ -1,7 +1,7 @@
 ipykernel
 pandas
 numpy
-scikit-learn
+scikit-learn==1.8.0
 seaborn
 matplotlib
 kagglesdk==0.1.23
