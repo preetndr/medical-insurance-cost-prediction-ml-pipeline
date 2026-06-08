@@ -8,3 +8,5 @@ kagglesdk==0.1.23
 kagglehub
 streamlit
 openpyxl
+xgboost
+statsmodels
