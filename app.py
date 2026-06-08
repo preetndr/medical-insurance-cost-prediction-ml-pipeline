@@ -4,9 +4,9 @@ import pickle
 import numpy as np
 import streamlit.components.v1 as components
 
-# -----------------------------------------------------------------------------
-# 1. Page Configuration & Advanced Theme CSS
-# -----------------------------------------------------------------------------
+# =============================================================================
+# Streamlit Application Configuration
+# =============================================================================
 st.set_page_config(
     page_title="Health Insurance Estimator",
     page_icon="⚕️",
@@ -14,125 +14,280 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Advanced CSS: Radial background, Glassmorphism, and Animated UI elements
+# =============================================================================
+# Custom UI Styling (Brown & Pink Theme)
+# -----------------------------------------------------------------------------
+# Contains premium UI styling, animations, typography, inputs, button
+# interactions, and responsive visual enhancements.
+# =============================================================================
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
-    /* Force a dark radial background with grid */
+    @import url('https://api.fontshare.com/v2/css?f[]=clash-display@600,700,800&f[]=satoshi@400,500,700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap');
+
+    /* Global Typography */
+    html, body, [class*="css"], .stMarkdown, p, span, div, li {
+        font-family: 'Satoshi', sans-serif !important;
+    }
+    
+    h1, h2, h3, .gradient-text, .section-header {
+        font-family: 'Clash Display', sans-serif !important;
+    }
+    
+    button, .stButton > button,
+    label, .stLabel,
+    input, select, textarea,
+    div[data-baseweb="input"] *,
+    div[data-baseweb="select"] * {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        letter-spacing: 0.03em !important; 
+    }
+
+    /* Base Theme */
     .stApp {
-        background-color: #0F172A;
-        background-image: 
-            radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
-            radial-gradient(at 100% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
-            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='20' cy='20' r='1' fill='rgba(255,255,255,0.05)'/></svg>");
-        font-family: 'Inter', sans-serif;
+        background-color: #1a1615; /* Deep rich brown/black background */
     }
-    
-    /* App Logo/Icon */
-    .app-logo {
-        text-align: center;
-        font-size: 3.5rem;
-        margin-bottom: -15px; 
-        text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.03;
+        z-index: 0;
+        background-image:
+            radial-gradient(rgba(244, 114, 182, 0.4) 1px, transparent 1px); /* Pink dot matrix */
+        background-size: 6px 6px;
     }
-    
-    /* Elegant typography */
-    .main-title {
-        font-family: 'Inter', sans-serif;
-        font-weight: 700;
-        color: #F8FAFC; 
-        text-align: center;
-        margin-bottom: 0.5rem;
-        letter-spacing: -0.5px;
-    }
-    .sub-title {
-        font-family: 'Inter', sans-serif;
-        color: #94A3B8; 
-        text-align: center;
-        font-size: 1.1rem;
-        font-weight: 300;
-        margin-bottom: 3rem;
-    }
-    
-    /* Input Field Styling */
-    div[data-baseweb="input"] > div, div[data-baseweb="select"] > div {
-        background-color: rgba(30, 41, 59, 0.5) !important;
-        border: 1px solid rgba(56, 189, 248, 0.2) !important;
-        border-radius: 8px !important;
-        color: white !important;
-        transition: all 0.3s ease;
-    }
-    div[data-baseweb="input"] > div:hover, div[data-baseweb="select"] > div:hover {
-        border-color: rgba(56, 189, 248, 0.6) !important;
-        box-shadow: 0 0 12px rgba(56, 189, 248, 0.2) !important;
-    }
+
+    /* Labels */
     .stNumberInput label, .stSelectbox label {
-        color: #E2E8F0 !important;
-        font-weight: 500 !important;
-        font-family: 'Inter', sans-serif;
-    }
-    
-    /* Premium Button Styling */
-    .stButton > button {
-        background: linear-gradient(135deg, #0284C7 0%, #38BDF8 100%) !important;
-        color: white !important;
-        border: none !important;
-        padding: 0.75rem 2rem !important;
-        border-radius: 12px !important;
-        font-weight: 600 !important;
-        font-size: 1.1rem !important;
-        letter-spacing: 0.5px !important;
-        box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.5), 0 8px 10px -6px rgba(2, 132, 199, 0.1) !important;
-        transition: all 0.3s ease !important;
-        width: 100% !important;
-    }
-    
-    /* Glassmorphism Result Card */
-    .result-card {
-        background: rgba(30, 41, 59, 0.7);
-        backdrop-filter: blur(12px);
-        padding: 2.5rem;
-        border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-        text-align: center;
-        margin-top: 2rem;
-        position: relative;
-        overflow: hidden;
-    }
-    .result-card::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #0284C7, #38BDF8);
-    }
-    .result-label {
-        color: #94A3B8;
-        font-size: 1.1rem;
-        font-weight: 500;
+        color: #A09692 !important; /* Soft brown/grey */
+        font-size: 0.85rem !important;
+        font-weight: 600 !important; 
+        letter-spacing: 0.1em !important;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
-        margin-bottom: 0.5rem;
+        margin-bottom: 12px !important;
+        transition: color 0.4s ease !important;
     }
-    .result-value {
-        color: #F8FAFC;
-        font-size: 3.5rem;
-        font-weight: 700;
-        text-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
-        margin: 0;
+    .stNumberInput:hover label, .stSelectbox:hover label {
+        color: #FFFFFF !important; 
     }
+
+    /* Input & Selectbox Styling (Glassmorphism) */
+    div[data-baseweb="input"] > div,
+    div[data-baseweb="select"] > div {
+        background: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 8px !important;
+        min-height: 44px !important; /* Uniform height to prevent clipping */
+        padding: 0px 12px !important; /* Removed vertical padding that squishes text */
+        box-shadow: none !important; 
+        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    
+    div[data-baseweb="input"] > div:hover, div[data-baseweb="input"] > div:focus-within,
+    div[data-baseweb="select"] > div:hover, div[data-baseweb="select"] > div:focus-within {
+        background: rgba(255, 255, 255, 0.06) !important;
+        border-color: rgba(244, 114, 182, 0.35) !important; /* Pink border */
+        box-shadow: 0 0 15px rgba(244, 114, 182, 0.05) !important;
+    }
+    
+    /* Input Text Coloring */
+    div[data-baseweb="input"] input,
+    div[data-baseweb="select"] > div > div:first-child,
+    div[data-baseweb="select"] > div > div:first-child * {
+        color: #F472B6 !important; /* Pink text */
+        -webkit-text-fill-color: #F472B6 !important;
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
+        transition: color 0.3s ease !important;
+    }
+
+    div[data-baseweb="input"]:hover input,
+    div[data-baseweb="select"]:hover > div > div:first-child {
+        text-shadow: 0 0 10px rgba(244, 114, 182, 0.3);
+    }
+    
+    /* Perfectly center the selectbox text */
+    div[data-baseweb="select"] > div > div:first-child {
+        display: flex !important;
+        align-items: center !important;
+        height: 100% !important;
+    }
+
+    /* Section Headers */
+    .section-header {
+        color: #8D6E63; /* Warm Brown */
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        margin-top: 50px;
+        margin-bottom: 25px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(141, 110, 99, 0.2); 
+        background: none;
+        box-shadow: none;
+        display: block;
+    }
+
+    /* Premium Button */
+    .element-container:has(.stButton) {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+        margin-top: 18px !important;
+    }
+
+    div.stButton {
+        width: auto !important;
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    div.stButton > button {
+        position: relative !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: auto !important;
+        min-width: 0 !important;
+        padding: 13px 30px !important;
+        border-radius: 8px !important;
+        background: rgba(255,255,255,0.045) !important;
+        border: 1px solid rgba(255,255,255,0.08) !important;
+        color: #D8D8D8 !important;
+        backdrop-filter: blur(10px) !important;
+        overflow: hidden !important;
+
+        transition:
+            transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+            background 0.45s ease,
+            border-color 0.45s ease,
+            box-shadow 0.45s ease !important;
+
+        box-shadow:
+            0 0 0 rgba(244, 114, 182, 0),
+            0 8px 30px rgba(0,0,0,0.18);
+    }
+
+    div.stButton > button p,
+    div.stButton > button span {
+        margin: 0 !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-size: 11px !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.14em !important;
+        text-transform: uppercase !important;
+        transition: color 0.35s ease !important;
+    }
+
+    div.stButton > button::before {
+        content: "";
+        position: absolute;
+        inset: -40%;
+        background:
+            radial-gradient(
+                circle at center,
+                rgba(244, 114, 182, 0.20) 0%, /* Pink glow */
+                rgba(141, 110, 99, 0.15) 30%, /* Brown edge */
+                transparent 70%
+            );
+
+        opacity: 0;
+        transform: translateX(-30%) translateY(10%) scale(0.8);
+        transition:
+            opacity 0.6s ease,
+            transform 0.8s cubic-bezier(0.16,1,0.3,1);
+        pointer-events: none;
+    }
+
+    div.stButton > button:hover {
+        transform: translateY(-2px) scale(1.015);
+        background: rgba(255,255,255,0.065) !important;
+        border-color: rgba(244, 114, 182, 0.3) !important;
+        box-shadow:
+            0 0 40px rgba(244, 114, 182, 0.12),
+            0 12px 40px rgba(0,0,0,0.3);
+    }
+
+    div.stButton > button:hover::before {
+        opacity: 1;
+        transform: translateX(15%) translateY(-10%) scale(1.15);
+    }
+
+    div.stButton > button:hover p,
+    div.stButton > button:hover span {
+        color: white !important;
+    }
+
+    div.stButton > button:active {
+        transform: translateY(0px) scale(0.985);
+    }
+
+    /* Input Animations */
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .stNumberInput, .stSelectbox {
+        animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        margin-bottom: 24px !important;
+    }
+
+    /* Gradient Text (Brown & Pink) */
+    @keyframes textShine {
+        0% { background-position: 0% center; }
+        100% { background-position: 100% center; }
+    }
+    .gradient-text {
+        background: linear-gradient(120deg, #8D6E63 30%, #F472B6 50%, #8D6E63 70%); /* Brown & Pink */
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: textShine 4s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    }
+    
+    .block-container {
+        margin-top: -64px !important; 
+    }
+
+    .section-header {
+        margin-top: 62px;
+    }
+
+    /* Page load animation */
+    .main .block-container {
+        animation: pageReveal 900ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes pageReveal {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Result Reveal Animation */
+    .result-reveal {
+        animation: resultReveal 650ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes resultReveal {
+        from { opacity: 0; transform: translateY(14px); filter: blur(6px); }
+        to { opacity: 1; transform: translateY(0); filter: blur(0px); }
+    }
+
     </style>
 """,
     unsafe_allow_html=True,
 )
 
 
-# -----------------------------------------------------------------------------
-# 2. Load Models (Cached for speed)
-# -----------------------------------------------------------------------------
+# =============================================================================
+# Load Models (Cached for speed)
+# =============================================================================
 @st.cache_resource
 def load_models():
     """Loads the trained pipeline and the target transformer"""
@@ -151,51 +306,88 @@ except FileNotFoundError:
     )
     st.stop()
 
-# -----------------------------------------------------------------------------
-# 3. Application Header
-# -----------------------------------------------------------------------------
-st.markdown("<div class='app-logo'>⚕️</div>", unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# =============================================================================
+# Hero Section
+# =============================================================================
 st.markdown(
-    "<h1 class='main-title'>Health Insurance Cost Estimator</h1>",
-    unsafe_allow_html=True,
-)
-st.markdown(
-    "<p class='sub-title'>Enter patient demographics to predict annual charges</p>",
+    """
+    <h1 style='font-size: 60px; margin-bottom: 0; line-height: 1.1; text-align: center;'>
+        Health Insurance<br>
+        <span class='gradient-text' style='font-size: 68px; font-weight: 800; display: block;'>Estimator</span>
+    </h1>
+    <p style='color: #A09692; font-size: 16px; margin-top: 20px; text-align: center; font-weight: 500;'>
+        Predicting patient annual charges using demographic analysis.
+    </p>
+""",
     unsafe_allow_html=True,
 )
 
-# -----------------------------------------------------------------------------
-# 4. Clean User Input Layout
-# -----------------------------------------------------------------------------
-# Using columns to create a balanced, symmetrical form
+st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
+
+st.markdown(
+    """
+    <hr style="
+        width:76%;
+        margin:-34px auto 26px auto;
+        border:none;
+        height:0.5px;
+        background-color:rgba(255,255,255,0.06);
+    ">
+    """,
+    unsafe_allow_html=True,
+)
+
+st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+
+# =============================================================================
+# User Input Section
+# =============================================================================
+
+st.markdown(
+    "<div class='section-header'>👤 Patient Details</div>", unsafe_allow_html=True
+)
 col1, col2 = st.columns(2)
-
 with col1:
     age = st.number_input("Age", min_value=18, max_value=65, value=30, step=1)
+with col2:
+    sex = st.selectbox("Sex", options=["Male", "Female"])
+
+
+st.markdown(
+    "<div class='section-header'>⚖️ Body Metrics & Family</div>", unsafe_allow_html=True
+)
+col3, col4 = st.columns(2)
+with col3:
     bmi = st.number_input(
         "BMI", min_value=15.00, max_value=55.00, value=25.00, step=0.10
     )
+with col4:
     children = st.number_input(
         "Dependents (Children)", min_value=0, max_value=5, value=0, step=1
     )
 
-with col2:
+
+st.markdown(
+    "<div class='section-header'>🏥 Lifestyle & Location</div>", unsafe_allow_html=True
+)
+col5, col6 = st.columns(2)
+with col5:
     smoker = st.selectbox("Smoker Status", options=["No", "Yes"])
-    sex = st.selectbox("Sex", options=["Male", "Female"])
+with col6:
     region = st.selectbox(
         "Region", options=["Southwest", "Southeast", "Northwest", "Northeast"]
     )
 
-# -----------------------------------------------------------------------------
-# 5. Prediction Logic & Auto-Scroll
-# -----------------------------------------------------------------------------
+
+# =============================================================================
+# Prediction Execution
+# =============================================================================
 st.markdown("<br>", unsafe_allow_html=True)
-button_col1, button_col2, button_col3 = st.columns([1, 2, 1])
 
-with button_col2:
-    predict_button = st.button("Calculate Estimate", use_container_width=True)
-
-if predict_button:
+if st.button("Calculate Estimate"):
     # Construct DataFrame to match the exact format of the training data
     input_data = pd.DataFrame(
         {
@@ -208,48 +400,65 @@ if predict_button:
         }
     )
 
-    with st.spinner("Processing..."):
-        # 1. Model predicts the transformed target
-        transformed_prediction = pipeline.predict(input_data)
+    with st.spinner("Processing demographics..."):
+        try:
+            # 1. Model predicts the transformed target
+            transformed_prediction = pipeline.predict(input_data)
 
-        # 2. Inverse transform back to actual dollars
-        actual_charge = pt.inverse_transform(
-            transformed_prediction.reshape(-1, 1)
-        ).ravel()[0]
+            # 2. Inverse transform back to actual dollars
+            actual_charge = pt.inverse_transform(
+                transformed_prediction.reshape(-1, 1)
+            ).ravel()[0]
 
-        # 3. Display Result Card
-        st.markdown(
-            f"""
-            <div class="result-card">
-                <div class="result-label">Estimated Annual Cost</div>
-                <div class="result-value">${actual_charge:,.2f}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+            # 3. Premium Result Reveal
+            st.markdown(
+                """
+                <div class="result-reveal" style="text-align:center; margin-top:38px; padding:42px 20px 12px;">
+                    <p style="color:#8D6E63; font-size:11px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; margin:0 0 18px;">
+                        Estimated Annual Cost
+                    </p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-        # 4. Auto-Scroll to Result Card Using JavaScript
-        components.html(
-            """
-            <script>
-            // We use a slight delay to ensure Streamlit has finished rendering the HTML
-            setTimeout(function() {
-                const doc = window.parent.document;
-                const resultCard = doc.querySelector('.result-card');
-                if (resultCard) {
-                    // Scrolls the screen so the result card is in the center
-                    resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }, 100);
-            </script>
-            """,
-            height=0,
-            width=0,
-        )
+            st.markdown(
+                f"<h1 style='text-align:center; font-size:68px; margin:0; font-family:Clash Display, sans-serif; line-height:1;' class='gradient-text'><span style='font-size:32px; vertical-align:super;'>$</span>{actual_charge:,.2f}</h1>",
+                unsafe_allow_html=True,
+            )
 
+            st.markdown(
+                "<div style='width:46px; height:1px; background:rgba(244, 114, 182, 0.22); margin:28px auto 0;'></div>",
+                unsafe_allow_html=True,
+            )
+
+            # 4. Auto-Scroll to Result Card Using JavaScript
+            components.html(
+                """
+                <script>
+                    setTimeout(function() {
+                        const result = window.parent.document.querySelector('.result-reveal');
+                        if (result) {
+                            result.scrollIntoView({
+                                behavior: 'smooth', block: 'center'
+                            });
+                        }
+                    }, 100);
+                </script>
+                """,
+                height=0,
+            )
+
+        except Exception as e:
+            st.error(f"Computation Error: {e}")
+
+st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)
+
+# =============================================================================
+# Frontend Interaction Enhancements
 # -----------------------------------------------------------------------------
-# 6. JavaScript Injector (Button Animations)
-# -----------------------------------------------------------------------------
+# JavaScript used for hover motion effects and smooth UI interactions.
+# =============================================================================
 components.html(
     """
     <script>
